@@ -21,6 +21,10 @@ const ProjectSchema = new Schema({
   website_link: {
     type: String,
     required: true
+  },
+  image_link: {
+    type: String,
+    required: true
   }
 });
 
