@@ -23,9 +23,7 @@ router.post('/addQuotes', fetchuser, [
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() })
         }
-        const quotes = new Quotes({
-            quote, display
-        })
+        const quotes = new Quotes({ quote, display, user: req.user.id })
         const saveQuote = await quotes.save()
         res.json(saveQuote)
     } catch (error) {

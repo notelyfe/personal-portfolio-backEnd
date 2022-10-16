@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const fetchuser = require('../MiddleWare/fetchuser')
 const { body, validationResult } = require('express-validator');
+const multer = require('multer')
 
 //fetch certificates using post '/api/certificates/fetchCertificate'
 router.post('/fetchCertificate', async (req, res) => {
@@ -10,30 +11,43 @@ router.post('/fetchCertificate', async (req, res) => {
     res.json(certificates)
 })
 
+//creating image bufffer
+const Storage = multer.diskStorage({
+    destination: './portfolioImages/certificates',
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    },
+});
+
+const upload = multer({
+    storage: Storage
+}).single('certificateImage')
+
 //add certificate using post '/api/certificates/addCertificate'
 router.post('/addCertificate', fetchuser, [
     body('title').isLength({ min: 3 }),
-    body('certificate_link').isLength({ min: 5 }),
-    body('issued_by'),
+    body('issued_by').isLength({ min: 3 }),
+    body('certificate_image'),
 ], async (req, res) => {
-
-    const { title, certificate_link, issued_by } = req.body;
-
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-        const certificate = new Certificate({
-            title, certificate_link, issued_by
+    
+        upload(req, res, (err) => {
+            if (err) {
+                console.log(err)
+            } else {
+                const newCertificate = new Certificate({
+                    user: req.user.id,
+                    title: req.body.title,
+                    issued_by: req.body.issued_by,
+                    certificate_image: {
+                        data: req.file.filename,
+                        contentType: 'image/png'
+                    }
+                })
+                newCertificate.save()
+                    .then(() => res.send('uploaded successfully'))
+                    .catch(err => console.log(err))
+            }
         })
-        const saveCertificate = await certificate.save()
-        res.json(saveCertificate)
-        
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send('Internal server error');
-    }
 })
 
 module.exports = router;

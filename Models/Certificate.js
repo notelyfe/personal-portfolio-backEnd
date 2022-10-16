@@ -10,13 +10,13 @@ const CertificateSchema = new Schema({
     type: String,
     required: true
   },
-  certificate_link: {
-    type: String,
-    required: true
+  certificate_image: {
+    data: Buffer,
+    contentType: String
   },
   issued_by: {
     type: String,
-    required: false
+    required: true
   }
 });
 

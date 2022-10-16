@@ -3,6 +3,7 @@ const router = express.Router();
 const Resume = require('../Models/Resume');
 const fetchuser = require('../MiddleWare/fetchuser')
 const { body, validationResult } = require('express-validator');
+const multer = require('multer')
 
 //fetch resume using post '/api/resume/fetchResume'
 router.post('/fetchResume', async (req, res) => {
@@ -10,26 +11,39 @@ router.post('/fetchResume', async (req, res) => {
     res.json(resume)
 })
 
+//creating image buffer
+const Storage = multer.diskStorage({
+    destination: './portfolioImages/resume',
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    },
+});
+
+const upload = multer({
+    storage: Storage
+}).single('resumeFile')
+
 //add resume using post '/api/resume/addResume'
 router.post('/addResume', fetchuser, [
-    body('resume_link').isLength({ min: 5 })
-], async (req, res) => {
+    body('resume_file'),
+], (req, res) => {
 
-    const { resume_link } = req.body;
-
-    try {
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() })
+    upload(req, res, (err) => {
+        if (err) {
+            console.log(err)
+        } else {
+            const newResume = new Resume({
+                user: req.user.id,
+                resume_file: {
+                    data: req.file.filename,
+                    contentType: 'resume/pdf'
+                }
+            })
+            newResume.save()
+                .then(() => res.send('uploaded successfully'))
+                .catch(err => console.log(err))
         }
-        const resume = new Resume({ resume_link })
-        const saveResume = await resume.save()
-        res.json(saveResume)
-
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send('Internal server error');
-    }
+    })
 })
 
 module.exports = router;

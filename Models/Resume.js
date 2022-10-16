@@ -6,9 +6,9 @@ const ResumeSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   },
-  resume_link: {
-    type: String,
-    required: true
+  resume_file: {
+    data: Buffer,
+    contentType: String
   }
 });
 
