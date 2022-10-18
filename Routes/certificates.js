@@ -1,9 +1,9 @@
 const Certificate = require('../Models/Certificate');
 const express = require('express');
 const router = express.Router();
-const fetchuser = require('../MiddleWare/fetchuser')
+const fetchuser = require('../MiddleWare/fetchuser');
 const { body } = require('express-validator');
-const multer = require('multer')
+const multer = require('multer');
 const fs = require('fs');
 
 //fetch certificates using post '/api/certificates/fetchCertificate'

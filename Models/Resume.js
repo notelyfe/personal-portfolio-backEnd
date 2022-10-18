@@ -9,6 +9,10 @@ const ResumeSchema = new Schema({
   resume_file: {
     data: Buffer,
     contentType: String
+  },
+  download_link: {
+    type: String,
+    required: true
   }
 });
 

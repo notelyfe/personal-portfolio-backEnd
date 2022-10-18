@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Resume = require('../Models/Resume');
 const fetchuser = require('../MiddleWare/fetchuser')
-const { body, validationResult } = require('express-validator');
-const multer = require('multer')
+const { body } = require('express-validator');
+const multer = require('multer');
+const fs = require('fs');
 
 //fetch resume using post '/api/resume/fetchResume'
 router.post('/fetchResume', async (req, res) => {
@@ -19,31 +20,31 @@ const Storage = multer.diskStorage({
     },
 });
 
-const upload = multer({
-    storage: Storage
-}).single('resumeFile')
+const upload = multer({ storage: Storage })
 
 //add resume using post '/api/resume/addResume'
-router.post('/addResume', fetchuser, [
+router.post('/addResume', fetchuser, upload.single('resumeFile'), [
     body('resume_file'),
+    body('download_link').isLength({min: 5})
 ], (req, res) => {
 
-    upload(req, res, (err) => {
-        if (err) {
-            console.log(err)
-        } else {
-            const newResume = new Resume({
-                user: req.user.id,
-                resume_file: {
-                    data: req.file.filename,
-                    contentType: 'resume/pdf'
-                }
-            })
-            newResume.save()
-                .then(() => res.send('uploaded successfully'))
-                .catch(err => console.log(err))
+    const newResume = new Resume({
+        user: req.user.id,
+        download_link: req.body.download_link,
+        resume_file: {
+            data: fs.readFileSync('./portfolioImages/resume/' + req.file.filename),
+            contentType: 'image/png'
         }
     })
+    newResume.save()
+        .then((res) => {
+            console.log("Resume upload success")
+        })
+        .catch((err) => {
+            console.log(err, "Error occur")
+        });
+    res.send('Resume upload success')
+
 })
 
 module.exports = router;
