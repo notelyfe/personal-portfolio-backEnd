@@ -31,4 +31,25 @@ router.post('/addQuotes', fetchuser, [
         res.status(500).send('Internal server error');
     }
 })
+
+//Delete Quotes Using Delete '/api/quotes/deleteQuote'
+router.delete('/deleteQuote/:id', fetchuser, async (req, res) => {
+    try {
+        let quote = await Quotes.findById(req.params.id);
+        if (!quote) {
+            res.status(404).send("Quote Not Found")
+        }
+        if (quote.user.toString() !== req.user.id) {
+            return res.status(401).send('Action Not Allowed')
+        }
+
+        quote = await Quotes.findByIdAndDelete(req.params.id)
+        res.json({ "Success": "Quotes has Been Deleted"})
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Internal server error');
+    }
+})
+
 module.exports = router;

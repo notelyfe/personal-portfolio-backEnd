@@ -25,7 +25,7 @@ const upload = multer({ storage: Storage })
 //add resume using post '/api/resume/addResume'
 router.post('/addResume', fetchuser, upload.single('resumeFile'), [
     body('resume_file'),
-    body('download_link').isLength({min: 5})
+    body('download_link').isLength({ min: 5 })
 ], (req, res) => {
 
     const newResume = new Resume({
@@ -45,6 +45,26 @@ router.post('/addResume', fetchuser, upload.single('resumeFile'), [
         });
     res.send('Resume upload success')
 
+})
+
+//Delete Resume Using Delete '/api/resume/deleteResume'
+router.delete('/deleteResume/:id', fetchuser, async (req, res) => {
+    try {
+        let resume = await Resume.findById(req.params.id);
+        if (!resume) {
+            res.status(404).send("Resume Not Found")
+        }
+        if (resume.user.toString() !== req.user.id) {
+            return res.status(401).send('Action Not Allowed')
+        }
+
+        resume = await Resume.findByIdAndDelete(req.params.id)
+        res.json({ "Success": "Resume has Been Deleted"})
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Internal server error');
+    }
 })
 
 module.exports = router;

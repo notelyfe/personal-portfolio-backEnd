@@ -45,8 +45,29 @@ router.post('/addCertificate', fetchuser, upload.single("certificateImage"), [
         .catch((err) => {
             console.log(err, "Error occur")
         });
-    res.send('certificate upload success')
+    res.send("certificate upload success")
 
+})
+
+//Delete Certificate using delete '/api/certificate/deleteCertificate/'
+router.delete('/deleteCertificate/:id', fetchuser, async (req, res) => {
+    try {
+        let certificate = await Certificate.findById(req.params.id)
+        if (!certificate) {
+            res.status(404).send("Not Found")
+        }
+
+        if (certificate.user.toString() !== req.user.id) {
+            return res.status(401).send("Action Not allowed")
+        }
+
+        certificate = await Certificate.findByIdAndDelete(req.params.id)
+        res.json({ "Success": "Certificate has Been Deleted" })
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Internal server error');
+    }
 })
 
 module.exports = router;
