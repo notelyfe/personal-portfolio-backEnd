@@ -15,6 +15,7 @@ app.use('/api/projects', require('./src/Routes/project'))
 app.use('/api/certificates', require('./src/Routes/certificates'))
 app.use('/api/quotes', require('./src/Routes/quote'))
 app.use('/api/resume', require('./src/Routes/resume'))
+app.use('/api/spotify', require('./src/Routes/Spotify'))
 
 app.listen(port, () => {
     console.log(`portfolio server is running on port ${port}`)
