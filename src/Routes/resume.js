@@ -5,6 +5,7 @@ const fetchuser = require('../MiddleWare/fetchuser')
 const { body } = require('express-validator');
 const multer = require('multer');
 const fs = require('fs');
+const { uploadFile } = require("../MiddleWare/awsAuth")
 
 //fetch resume using post '/api/resume/fetchResume'
 router.post('/fetchResume', async (req, res) => {
@@ -14,7 +15,7 @@ router.post('/fetchResume', async (req, res) => {
 
 //creating image buffer
 const Storage = multer.diskStorage({
-    destination: './portfolioImages/resume',
+    destination: './portfolioFiles/resume',
     filename: (req, file, cb) => {
         cb(null, file.originalname);
     },
@@ -24,27 +25,26 @@ const upload = multer({ storage: Storage })
 
 //add resume using post '/api/resume/addResume'
 router.post('/addResume', fetchuser, upload.single('resumeFile'), [
-    body('resume_file'),
-    body('download_link').isLength({ min: 5 })
-], (req, res) => {
+    body('resume_file')
+], async (req, res) => {
 
-    const newResume = new Resume({
-        user: req.user.id,
-        download_link: req.body.download_link,
-        resume_file: {
-            data: fs.readFileSync('./portfolioImages/resume/' + req.file.filename),
-            contentType: 'image/png'
-        }
-    })
-    newResume.save()
-        .then((res) => {
-            console.log("Resume upload success")
+    try {
+        const file = req.file
+
+        const resume = await uploadFile(file)
+
+        const newResume = new Resume({
+            user: req.user.id,
+            resume_file: resume.Location
         })
-        .catch((err) => {
-            console.log(err, "Error occur")
-        });
-    res.send('Resume upload success')
 
+        const saveResume = newResume.save()
+
+        res.json(saveResume)
+
+    } catch (error) {
+        res.send(error)
+    }
 })
 
 //Delete Resume Using Delete '/api/resume/deleteResume'
@@ -59,7 +59,7 @@ router.delete('/deleteResume/:id', fetchuser, async (req, res) => {
         }
 
         resume = await Resume.findByIdAndDelete(req.params.id)
-        res.json({ "Success": "Resume has Been Deleted"})
+        res.json({ "Success": "Resume has Been Deleted" })
 
     } catch (error) {
         console.error(error.message);

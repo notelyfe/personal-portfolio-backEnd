@@ -11,7 +11,7 @@ const CertificateSchema = new Schema({
     required: true
   },
   certificate_image: {
-    data: Buffer,
+    type: String,
     contentType: String
   },
   issued_by: {

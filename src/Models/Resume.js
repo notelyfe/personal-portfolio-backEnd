@@ -7,12 +7,8 @@ const ResumeSchema = new Schema({
     ref: 'user'
   },
   resume_file: {
-    data: Buffer,
-    contentType: String
-  },
-  download_link: {
     type: String,
-    required: true
+    contentType: String
   }
 });
 

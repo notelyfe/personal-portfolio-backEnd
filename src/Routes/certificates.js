@@ -3,8 +3,11 @@ const express = require('express');
 const router = express.Router();
 const fetchuser = require('../MiddleWare/fetchuser');
 const { body } = require('express-validator');
-const multer = require('multer');
 const fs = require('fs');
+const multer = require('multer');
+const util = require('util')
+const unlinkFile = util.promisify(fs.unlink)
+const { uploadFile } = require('../MiddleWare/awsAuth')
 
 //fetch certificates using post '/api/certificates/fetchCertificate'
 router.post('/fetchCertificate', async (req, res) => {
@@ -14,7 +17,7 @@ router.post('/fetchCertificate', async (req, res) => {
 
 //creating image bufffer
 const Storage = multer.diskStorage({
-    destination: './portfolioImages/certificates',
+    destination: './portfolioFiles/certificates',
     filename: (req, file, cb) => {
         cb(null, file.originalname);
     },
@@ -29,24 +32,25 @@ router.post('/addCertificate', fetchuser, upload.single("certificateImage"), [
     body('certificate_image'),
 ], async (req, res) => {
 
-    const newCertificate = new Certificate({
-        user: req.user.id,
-        title: req.body.title,
-        issued_by: req.body.issued_by,
-        certificate_image: {
-            data: fs.readFileSync('./portfolioImages/certificates/' + req.file.filename),
-            contentType: 'image/png'
-        },
-    });
-    newCertificate.save()
-        .then((res) => {
-            console.log("certificate upload success")
-        })
-        .catch((err) => {
-            console.log(err, "Error occur")
-        });
-    res.send("certificate upload success")
+    try {
+        const file = req.file
 
+        const image = await uploadFile(file)
+
+        const newCertificate = new Certificate({
+            user: req.user.id,
+            title: req.body.title,
+            issued_by: req.body.issued_by,
+            certificate_image: image.Location,
+        });
+
+        const saveCertificate = newCertificate.save()
+        
+        res.json(saveCertificate)
+
+    } catch (error) {
+        res.send(error)
+    }
 })
 
 //Delete Certificate using delete '/api/certificate/deleteCertificate/'

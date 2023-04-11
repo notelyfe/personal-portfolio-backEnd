@@ -5,6 +5,7 @@ var fetchuser = require('../MiddleWare/fetchuser')
 const { body } = require('express-validator');
 const multer = require('multer');
 const fs = require('fs');
+const { uploadFile } = require("../MiddleWare/awsAuth")
 
 //Fetching all projects using post: '/api/projects/getprojects'
 router.post('/getprojects', async (req, res) => {
@@ -15,7 +16,7 @@ router.post('/getprojects', async (req, res) => {
 
 //creating image buffer
 const Storage = multer.diskStorage({
-    destination: './portfolioImages/projects',
+    destination: './portfolioFiles/projects',
     filename: (req, file, cb) => {
         cb(null, file.originalname);
     },
@@ -30,27 +31,29 @@ router.post('/addproject', fetchuser, upload.single("projectImage"), [
     body('project_link').isLength({ min: 5 }),
     body('website_link').isLength({ min: 5 }),
     body('project_image'),
-], (req, res) => {
+], async (req, res) => {
 
-    const project = new Projects({
-        user: req.user.id,
-        title: req.body.title,
-        description: req.body.description,
-        project_link: req.body.project_link,
-        website_link: req.body.website_link,
-        project_image: {
-            data: fs.readFileSync('./portfolioImages/projects/' + req.file.filename),
-            contentType: 'image/png'
-        },
-    });
-    project.save()
-        .then((res) => {
-            console.log("Image saved")
-        })
-        .catch((err) => {
-            console.log(err, "Error occur")
+    try {
+        const file = req.file
+
+        const project_image = await uploadFile(file)
+
+        const project = new Projects({
+            user: req.user.id,
+            title: req.body.title,
+            description: req.body.description,
+            project_link: req.body.project_link,
+            website_link: req.body.website_link,
+            project_image: project_image.Location
         });
-    res.send("Image saved")
+
+        const saveProject = await project.save()
+
+        res.json(saveProject)
+        
+    } catch (error) {
+        res.send(error)
+    }
 })
 
 //Edit project using put "/api/project/editProject"

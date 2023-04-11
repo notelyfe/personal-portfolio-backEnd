@@ -24,14 +24,18 @@ const getAccessToken = async () => {
 };
 
 const getNowPlaying = async () => {
-    const { access_token } = await getAccessToken();
+    try {
+        const { access_token } = await getAccessToken();
 
-    const res = await fetch(NOW_PLAYING_ENDPOINT, {
-        headers: {
-            Authorization: `Bearer ${access_token}`
-        }
-    });
-    return res.json()
+        const res = await fetch(NOW_PLAYING_ENDPOINT, {
+            headers: {
+                Authorization: `Bearer ${access_token}`
+            }
+        });
+        return res.json()
+    } catch (error) {
+        res.json(error);
+    }
 };
 
 module.exports = getNowPlaying;

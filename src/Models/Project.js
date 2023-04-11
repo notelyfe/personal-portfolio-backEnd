@@ -23,7 +23,7 @@ const ProjectSchema = new Schema({
     required: true
   },
   project_image: {
-    data: Buffer,
+    type: String,
     contentType: String
   }
 });

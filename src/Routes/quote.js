@@ -47,8 +47,7 @@ router.delete('/deleteQuote/:id', fetchuser, async (req, res) => {
         res.json({ "Success": "Quotes has Been Deleted"})
 
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send('Internal server error');
+        res.send(error);
     }
 })
 
