@@ -17,6 +17,16 @@ const CertificateSchema = new Schema({
   issued_by: {
     type: String,
     required: true
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  created_On: {
+    type: Date
+  },
+  updated_On: {
+    type: Date
   }
 });
 

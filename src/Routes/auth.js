@@ -32,6 +32,7 @@ router.post('/createuser', [
             name: req.body.name,
             user_id: req.body.user_id,
             password: securePass,
+            user_type: "Admin"
         })
 
         const data = {
@@ -39,9 +40,9 @@ router.post('/createuser', [
                 id: user.id
             }
         }
-        const authtoken = jwt.sign(data, JWT_SECRET)
+        const access_token = jwt.sign(data, JWT_SECRET)
         success = true
-        res.json({ success, authtoken })
+        res.json({ success, access_token })
 
     } catch (error) {
         res.status(500).send('Internal Server Error')
@@ -73,9 +74,9 @@ router.post('/login', async (req, res) => {
                 id: user.id
             }
         }
-        const authtoken = jwt.sign(data, JWT_SECRET)
+        const access_token = jwt.sign(data, JWT_SECRET)
         success = true
-        res.json({ success, authtoken })
+        res.json({ success, access_token })
 
     } catch (error) {
         res.status(500).json({error: 'Internal Server Error'})
@@ -83,9 +84,9 @@ router.post('/login', async (req, res) => {
 })
 
 //get loggedin user data using post: '/api/auth/userdata' login Require
-router.post('/userdata', fetchuser, async (req, res) => {
+router.get('/userdata', fetchuser, async (req, res) => {
     try {
-        userId = req.user.id;
+        const userId = req.user.id;
         const user = await User.findById(userId).select("-password")
         res.send(user)
     } catch (error) {

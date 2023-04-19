@@ -3,8 +3,10 @@ var jwt = require('jsonwebtoken')
 const JWT_SECRET = process.env.jwtSecret;
 
 const fetchuser = (req, res, next) => {
-    const token = req.header('auth-token');
-    if(!token){
+
+    const token = req.header('access_token');
+    
+    if (!token) {
         res.status(401).send({ error: 'Please authenticate using a valid token' })
     }
     try {
