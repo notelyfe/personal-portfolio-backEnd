@@ -7,6 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
+  "engines": {
+    "node": ">=14 <15"
+  },
   "author": "notelyfe",
   "license": "ISC",
   "dependencies": {
@@ -20,8 +23,7 @@
     "isomorphic-unfetch": "^4.0.2",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.3",
-    "multer": "^1.4.5-lts.1",
-    "node": "^14.20.1"
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
