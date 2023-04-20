@@ -12,7 +12,6 @@ const CertificateSchema = new Schema({
   },
   certificate_image: {
     type: String,
-    contentType: String
   },
   issued_by: {
     type: String,
@@ -27,6 +26,9 @@ const CertificateSchema = new Schema({
   },
   updated_On: {
     type: Date
+  },
+  certificate_key: {
+    type: String
   }
 });
 

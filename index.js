@@ -4,7 +4,7 @@ const connectToMongo = require('./src/config/db');
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const port = process.env.PORT || 8000 ;
+const port = process.env.PORT || 8000;
 
 app.use(cors())
 
@@ -16,6 +16,10 @@ app.use('/api/certificates', require('./src/Routes/certificates'))
 app.use('/api/quotes', require('./src/Routes/quote'))
 app.use('/api/resume', require('./src/Routes/resume'))
 app.use('/api/spotify', require('./src/Routes/Spotify'))
+
+app.get('*', (req, res) => {
+    res.status(404).json({ message: 'Page Not Found' })
+})
 
 app.listen(port, () => {
     console.log(`portfolio server is running on port ${port}`)

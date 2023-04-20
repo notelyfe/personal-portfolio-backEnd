@@ -5,7 +5,7 @@ const fetchuser = require('../MiddleWare/fetchuser')
 const { body } = require('express-validator');
 const multer = require('multer');
 const fs = require('fs');
-const { uploadFile } = require("../MiddleWare/awsAuth")
+const { uploadFile } = require("../Services/awsAuth")
 
 //fetch resume using post '/api/resume/fetchResume'
 router.post('/fetchResume', async (req, res) => {
