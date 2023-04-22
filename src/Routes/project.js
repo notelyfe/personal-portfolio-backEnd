@@ -104,7 +104,7 @@ router.put('/editProject/:id', fetchuser, upload.single("projectImage"), [
 
                 const project_updated = await Projects.findByIdAndUpdate({ _id: req.params.id }, update_project)
 
-                res.json({ message: "Projcet Updated Successfully" })
+                res.status(200).json({ message: "Projcet Updated Successfully" })
 
             } else {
                 return res.status(401).json({ message: "Action Not allowed" })

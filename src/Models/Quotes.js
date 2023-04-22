@@ -10,9 +10,11 @@ const QuoteSchema = new Schema({
     type: String,
     required: true
   },
-  display: {
+  isActive: {
     type: Boolean,
-    required: false
+  },
+  posted_On: {
+    type: Date
   }
 });
 

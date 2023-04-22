@@ -8,7 +8,15 @@ const ResumeSchema = new Schema({
   },
   resume_file: {
     type: String,
-    contentType: String
+  },
+  posted_On: {
+    type: Date
+  },
+  updated_On: {
+    type: Date
+  },
+  resume_key: {
+    type: String
   }
 });
 
