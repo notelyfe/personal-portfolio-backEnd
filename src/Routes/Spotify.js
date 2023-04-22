@@ -9,7 +9,7 @@ router.post('/getNowPlaying', async (req, res) => {
 
         res.json(nowPlaying)
     } catch (error) {
-        res.status(500).json({ message: "Spotify Server Error" })
+        res.json(error)
     }
 })
 
