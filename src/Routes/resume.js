@@ -109,6 +109,8 @@ router.delete('/deleteResume/:id', fetchuser, async (req, res) => {
         }
         if (resume.user.toString() === req.user.id) {
 
+            deleteFile(resume.resume_key)
+
             resume = await Resume.findByIdAndDelete(req.params.id)
             res.status(200).json({ message: "Resume has Been Deleted" })
 
