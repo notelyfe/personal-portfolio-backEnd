@@ -6,7 +6,7 @@ const { body, validationResult } = require('express-validator');
 
 //fetch quotes using post '/api/quotes/fetchQuotes'
 router.post('/fetchQuotes', async (req, res) => {
-    const quotes = await Quotes.find();
+    const quotes = await Quotes.find().select(["-user", "-isActive"]);
     res.json(quotes)
 })
 

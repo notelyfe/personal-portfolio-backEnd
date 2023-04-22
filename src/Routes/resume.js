@@ -9,7 +9,7 @@ const { uploadFile, deleteFile } = require("../Services/awsAuth")
 
 //fetch resume using post '/api/resume/fetchResume'
 router.post('/fetchResume', async (req, res) => {
-    const resume = await Resume.find()
+    const resume = await Resume.find().select(["-user", "-resume_key"])
     res.json(resume)
 })
 
