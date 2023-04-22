@@ -6,7 +6,7 @@ const { body, validationResult } = require('express-validator');
 
 //fetch quotes using post '/api/quotes/fetchQuotes'
 router.post('/fetchQuotes', async (req, res) => {
-    const quotes = await Quotes.find().select(["-user", "-isActive"]);
+    const quotes = await Quotes.find().select(["-user"]);
     res.json(quotes)
 })
 
@@ -55,6 +55,36 @@ router.post('/addQuotes', fetchuser, [
 
 })
 
+// <--Edit Status--> using patch '/api/quotes/status'
+router.patch('/status/:id', fetchuser, async (req, res) => {
+
+    try {
+
+        let quote = await Quotes.findById(req.params.id)
+
+        if(!quote){
+            return res.status(404).json({message: "Not Found"})
+        }else{
+            if(quote.user.toString() === req.user.id){
+
+                let status = ({
+                    isActive: !quote.isActive
+                })
+
+                await Quotes.findByIdAndUpdate({_id: req.params.id}, status)
+
+                res.status(200).json({message: "Status Updated"})
+
+            }else{
+                res.status(401).json({message: "Action Not allowed"})
+            }
+        }
+        
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
 //Delete Quotes Using Delete '/api/quotes/deleteQuote'
 router.delete('/deleteQuote/:id', fetchuser, async (req, res) => {
     try {
@@ -70,7 +100,7 @@ router.delete('/deleteQuote/:id', fetchuser, async (req, res) => {
         res.status(200).json({ message: "Quotes has Been Deleted" })
 
     } catch (error) {
-        res.send(error);
+        res.status(500).json({message: "Internal server error"});
     }
 })
 
