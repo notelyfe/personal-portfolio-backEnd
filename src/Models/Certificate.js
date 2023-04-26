@@ -12,6 +12,7 @@ const CertificateSchema = new Schema({
   },
   certificate_image: {
     type: String,
+    required: true
   },
   issued_by: {
     type: String,
@@ -28,7 +29,8 @@ const CertificateSchema = new Schema({
     type: Date
   },
   certificate_key: {
-    type: String
+    type: String,
+    required: true
   }
 });
 

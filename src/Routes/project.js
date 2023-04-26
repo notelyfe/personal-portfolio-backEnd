@@ -5,6 +5,7 @@ var fetchuser = require('../MiddleWare/fetchuser')
 const { body } = require('express-validator');
 const multer = require('multer');
 const { uploadFile, deleteFile } = require("../Services/awsAuth")
+const { sendNotification } = require('../Services/notificationService')
 
 //Fetching all projects using post: '/api/projects/getprojects'
 router.post('/getprojects', async (req, res) => {
@@ -55,8 +56,11 @@ router.post('/addproject', fetchuser, upload.single("projectImage"), [
         const saveProject = await project.save()
         res.json(saveProject)
 
+        sendNotification(req.user.id, `New Project named "${req.body.title}" is added in the collection`, "Create", "Success")
+
     } catch (error) {
-        res.json(error)
+        res.status(400).json(error)
+        sendNotification(req.user.id, `Your New Project didn't saved on collection, It Exit with status code "400"`, "Create", "Error")
     }
 })
 
@@ -102,9 +106,11 @@ router.put('/editProject/:id', fetchuser, upload.single("projectImage"), [
                     project_key: project_image.Key
                 });
 
-                const project_updated = await Projects.findByIdAndUpdate({ _id: req.params.id }, update_project)
+                await Projects.findByIdAndUpdate({ _id: req.params.id }, update_project)
 
                 res.status(200).json({ message: "Projcet Updated Successfully" })
+
+                sendNotification(req.user.id, `Project named "${req.body.title}" is edited`, "Edit", "Success")
 
             } else {
                 return res.status(401).json({ message: "Action Not allowed" })
@@ -133,9 +139,11 @@ router.patch('/status/:id', fetchuser, async (req, res) => {
                     isActive: !project?.isActive
                 })
 
-                const updated_Status = await Projects.findByIdAndUpdate({ _id: req.params.id }, status)
+                await Projects.findByIdAndUpdate({ _id: req.params.id }, status)
 
                 res.status(200).json({ message: 'Status Updated' })
+
+                sendNotification(req.user.id, `Project Status is Updated to ${status.isActive} for project "${project.title}"`, "Status Update", "Success")
             }
             else {
                 res.status(401).json({ message: "Action Not Allowed" })
@@ -163,9 +171,11 @@ router.delete('/deleteProject/:id', fetchuser, async (req, res) => {
 
                 deleteFile(project.project_key)
 
-                project = await Projects.findByIdAndDelete(req.params.id)
+                await Projects.findByIdAndDelete(req.params.id)
 
                 res.json({ message: "Project has Been Deleted" })
+
+                sendNotification(req.user.id, `Project named "${project.title}" is deleted permanently`, "Delete", "Success")
 
             } else {
                 return res.status(401).json({ message: "Action Not allowed" })
@@ -175,11 +185,6 @@ router.delete('/deleteProject/:id', fetchuser, async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
-})
-
-// <--Error-->
-router.get('*', (req, res) => {
-    res.status(404).json({ message: "Page Not Found" })
 })
 
 module.exports = router;

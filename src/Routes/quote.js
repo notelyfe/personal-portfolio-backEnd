@@ -3,6 +3,7 @@ const router = express.Router()
 const Quotes = require('../Models/Quotes')
 const fetchuser = require('../MiddleWare/fetchuser')
 const { body, validationResult } = require('express-validator');
+const { sendNotification } = require('../Services/notificationService')
 
 //fetch quotes using post '/api/quotes/fetchQuotes'
 router.post('/fetchQuotes', async (req, res) => {
@@ -49,6 +50,8 @@ router.post('/addQuotes', fetchuser, [
 
         res.status(200).json({ message: "Quotes Saved" })
 
+        sendNotification(req.user.id, `New Quotation "${req.body.quote}" is Posted`, "Create", "Success")
+
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
@@ -62,24 +65,24 @@ router.patch('/status/:id', fetchuser, async (req, res) => {
 
         let quote = await Quotes.findById(req.params.id)
 
-        if(!quote){
-            return res.status(404).json({message: "Not Found"})
-        }else{
-            if(quote.user.toString() === req.user.id){
+        if (!quote) {
+            return res.status(404).json({ message: "Not Found" })
+        } else {
+            if (quote.user.toString() === req.user.id) {
 
                 let status = ({
                     isActive: !quote.isActive
                 })
 
-                await Quotes.findByIdAndUpdate({_id: req.params.id}, status)
+                await Quotes.findByIdAndUpdate({ _id: req.params.id }, status)
 
-                res.status(200).json({message: "Status Updated"})
+                res.status(200).json({ message: "Status Updated" })
 
-            }else{
-                res.status(401).json({message: "Action Not allowed"})
+            } else {
+                res.status(401).json({ message: "Action Not allowed" })
             }
         }
-        
+
     } catch (error) {
         res.status(500).json({ message: "Internal Server Error" });
     }
@@ -100,7 +103,7 @@ router.delete('/deleteQuote/:id', fetchuser, async (req, res) => {
         res.status(200).json({ message: "Quotes has Been Deleted" })
 
     } catch (error) {
-        res.status(500).json({message: "Internal server error"});
+        res.status(500).json({ message: "Internal server error" });
     }
 })
 

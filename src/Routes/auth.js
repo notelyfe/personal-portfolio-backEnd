@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs')
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 var fetchuser = require('../MiddleWare/fetchuser')
+const { sendNotification } = require('../Services/notificationService')
 
 const JWT_SECRET = process.env.jwtSecret
 
@@ -21,8 +22,8 @@ router.post('/createuser', [
         return res.status(400).json({ errors: errors.array() });
     }
     try {
-        let user = await User.findOne({ user_id: req.body.user_id});
-        if(user){
+        let user = await User.findOne({ user_id: req.body.user_id });
+        if (user) {
             return res.status(400).json({ success, error: 'User Already Exist' })
         }
         const salt = await bcrypt.genSalt(10);
@@ -45,7 +46,7 @@ router.post('/createuser', [
         res.json({ success, access_token })
 
     } catch (error) {
-        res.status(500).json({message:'Internal Server Error'})
+        res.status(500).json({ message: 'Internal Server Error' })
     }
 })
 
@@ -58,15 +59,15 @@ router.post('/login', async (req, res) => {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const {user_id, password} = req.body
+    const { user_id, password } = req.body
 
     try {
         let user = await User.findOne({ user_id })
-        if(!user){
+        if (!user) {
             return res.status(400).json({ success, error: 'Invalid Credentials' })
         }
         const passwordCompare = await bcrypt.compare(password, user.password);
-        if(!passwordCompare){
+        if (!passwordCompare) {
             return res.status(400).json({ success, error: 'Invalid Credentials' })
         }
         const data = {
@@ -79,7 +80,7 @@ router.post('/login', async (req, res) => {
         res.json({ success, access_token })
 
     } catch (error) {
-        res.status(500).json({message: 'Internal Server Error'})
+        res.status(500).json({ message: 'Internal Server Error' })
     }
 })
 
@@ -90,7 +91,7 @@ router.get('/userdata', fetchuser, async (req, res) => {
         const user = await User.findById(userId).select("-password")
         res.send(user)
     } catch (error) {
-        res.status(500).json({message:"Internal Server error"})
+        res.status(500).json({ message: "Internal Server error" })
     }
 })
 

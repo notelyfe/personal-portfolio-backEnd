@@ -4,8 +4,8 @@ const Resume = require('../Models/Resume');
 const fetchuser = require('../MiddleWare/fetchuser')
 const { body } = require('express-validator');
 const multer = require('multer');
-const fs = require('fs');
 const { uploadFile, deleteFile } = require("../Services/awsAuth")
+const { sendNotification } = require('../Services/notificationService')
 
 //fetch resume using post '/api/resume/fetchResume'
 router.post('/fetchResume', async (req, res) => {
@@ -46,6 +46,8 @@ router.post('/addResume', fetchuser, upload.single('resumeFile'), [
         const saveResume = await newResume.save()
 
         res.json(saveResume)
+
+        sendNotification(req.user.id, "New Resume Upload", "Create", "Success")
 
     } catch (error) {
         res.send(error)
@@ -89,6 +91,8 @@ router.put('/editResume/:id', fetchuser, upload.single('resumeFile'), [
 
                 res.status(200).json({ message: "Resume Updated Successfully" })
 
+                sendNotification(req.user.id, "Resume Updated", "Edit", "Success")
+
             } else {
                 res.status(400).json({ message: "Action Not Allowed" })
             }
@@ -113,6 +117,8 @@ router.delete('/deleteResume/:id', fetchuser, async (req, res) => {
 
             resume = await Resume.findByIdAndDelete(req.params.id)
             res.status(200).json({ message: "Resume has Been Deleted" })
+
+            sendNotification(req.user.id, "Resume Deleted", "Delete", "Success")
 
         } else {
             return res.status(401).json({ message: 'Action Not Allowed' })

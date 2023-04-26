@@ -3,9 +3,9 @@ const express = require('express');
 const router = express.Router();
 const fetchuser = require('../MiddleWare/fetchuser');
 const { body } = require('express-validator');
-const fs = require('fs');
 const multer = require('multer');
 const { uploadFile, deleteFile } = require('../Services/awsAuth')
+const { sendNotification } = require('../Services/notificationService')
 
 //fetch certificates using post '/api/certificates/fetchCertificate'
 router.post('/fetchCertificate', async (req, res) => {
@@ -52,8 +52,12 @@ router.post('/addCertificate', fetchuser, upload.single("certificateImage"), [
 
         res.json(saveCertificate)
 
+        sendNotification(req.user.id, `New Certificate named "${req.body.title}" is added in the collection`, "Create", "Success")
+
     } catch (error) {
-        res.json(error)
+        res.status(400).json(error)
+        sendNotification(req.user.id, `Your New Certificate didn't saved on collection, It Exit with status code "400"`, "Create", "Error")
+
     }
 })
 
@@ -94,9 +98,11 @@ router.put('/editCertificate/:id', fetchuser, upload.single("certificateImage"),
                     certificate_key: image.Key
                 })
 
-                const certificate_updated = await Certificates.findByIdAndUpdate({ _id: req.params.id }, update_certificate)
+                await Certificates.findByIdAndUpdate({ _id: req.params.id }, update_certificate)
 
                 res.status(200).json({ message: 'Certificate Updated Successfully' })
+
+                sendNotification(req.user.id, `Certificate named "${req.body.title}" is edited`, "Edit", "Success")
 
             }
             else {
@@ -126,9 +132,11 @@ router.patch('/status/:id', fetchuser, async (req, res) => {
                     isActive: !certificate?.isActive
                 })
 
-                const updated_status = await Certificates.findByIdAndUpdate({ _id: req.params.id }, status)
+                await Certificates.findByIdAndUpdate({ _id: req.params.id }, status)
 
                 res.status(200).json({ message: "Status Updated Successfully" })
+
+                sendNotification(req.user.id, `Certificate Status is Updated to ${status.isActive} for certificate "${certificate.title}"`, "Status Update", "Success")
 
             } else {
                 return res.status(401).json({ message: 'Action Not Allowed' })
@@ -159,6 +167,8 @@ router.delete('/deleteCertificate/:id', fetchuser, async (req, res) => {
                 certificate = await Certificates.findByIdAndDelete(req.params.id)
 
                 res.json({ message: "Certificate has Been Deleted" })
+
+                sendNotification(req.user.id, `Certificate named "${certificate.title}" is deleted permanently`, "Delete", "Success")
 
             }
             else {

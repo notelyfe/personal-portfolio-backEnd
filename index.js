@@ -16,6 +16,7 @@ app.use('/api/certificates', require('./src/Routes/certificates'))
 app.use('/api/quotes', require('./src/Routes/quote'))
 app.use('/api/resume', require('./src/Routes/resume'))
 app.use('/api/spotify', require('./src/Routes/Spotify'))
+app.use('/api/notifications', require('./src/Routes/notification'))
 
 app.get('*', (req, res) => {
     res.status(404).json({ message: 'Page Not Found' })

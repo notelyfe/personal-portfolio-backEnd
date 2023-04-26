@@ -34,9 +34,11 @@ const ProjectSchema = new Schema({
   },
   project_image: {
     type: String,
+    required: true
   },
   project_key: {
-    type: String
+    type: String,
+    required: true
   }
 });
 
