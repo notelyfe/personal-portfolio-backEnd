@@ -6,7 +6,20 @@ const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 8000;
 
-app.use(cors())
+const whitelist = ['https://notelyfe.select']
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, origin)
+        } else {
+            callback(new Error("Not Allowed By Cors"));
+        }
+    },
+    optionsSuccessStatus: 200
+}
+
+app.use(cors(corsOptions))
 
 app.use(express.json())  //middle ware to use req.body
 
