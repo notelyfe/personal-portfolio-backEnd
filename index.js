@@ -1,23 +1,12 @@
 require('dotenv').config();
 
-const connectToMongo = require('./src/config/db');
+const connectToMongo = require('./src/Config/db');
 const express = require('express')
 const cors = require('cors')
 const app = express()
+const corsOptions = require('./src/Config/corsOptions')
+
 const port = process.env.PORT || 8000;
-
-const whitelist = ['https://notelyfe.select', 'https://admin.notelyfe.select']
-
-const corsOptions = {
-    origin: (origin, callback) => {
-        if (whitelist.indexOf(origin) !== -1) {
-            callback(null, origin)
-        } else {
-            callback(new Error("Not Allowed By Cors"));
-        }
-    },
-    optionsSuccessStatus: 200
-}
 
 app.use(cors(corsOptions))
 
@@ -31,8 +20,8 @@ app.use('/api/resume', require('./src/Routes/resume'))
 app.use('/api/spotify', require('./src/Routes/Spotify'))
 app.use('/api/notifications', require('./src/Routes/notification'))
 
-app.get('*', (req, res) => {
-    res.status(404).json({ message: 'Page Not Found' })
+app.all('*', (req, res) => {
+    res.status(404).json({ message: '404 Page Not Found' })
 })
 
 app.listen(port, () => {
