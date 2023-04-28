@@ -6,7 +6,7 @@ const cors = require('cors')
 const app = express()
 const port = process.env.PORT || 8000;
 
-const whitelist = ['https://notelyfe.select']
+const whitelist = ['https://notelyfe.select', 'https://admin.notelyfe.select']
 
 const corsOptions = {
     origin: (origin, callback) => {
