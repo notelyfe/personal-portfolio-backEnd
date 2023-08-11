@@ -2,7 +2,7 @@ const AWS = require("aws-sdk")
 const fs = require('fs')
 
 const accessKeyId = process.env.AWS_ACCESS_KEY
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY
+const secretAccessKey = process.env.AWS_SECRET_ACCESS__KEY
 const bucketName = process.env.AWS_BUCKET_NAME
 const region = process.env.AWS_BUCKET_REGION
 
