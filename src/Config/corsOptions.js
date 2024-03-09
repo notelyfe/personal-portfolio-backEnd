@@ -1,4 +1,4 @@
-const whitelist = ['https://notelyfe.select', 'https://admin.notelyfe.select']
+const whitelist = ['https://notelyfe.me', 'https://admin.notelyfe.me']
 
 const corsOptions = {
     origin: (origin, callback) => {
